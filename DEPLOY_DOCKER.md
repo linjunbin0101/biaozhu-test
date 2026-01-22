@@ -6,11 +6,23 @@
 
 ### 一键部署（推荐）
 
-如果您的服务器已安装Docker和Docker Compose，只需运行以下**单条命令**即可完成部署：
+如果您的服务器已安装Docker和Docker Compose，只需运行以下**单条命令**即可完成部署或更新：
 
 ```bash
-# 拉取代码到/opt路径并部署（一键完成）
-git clone https://github.com/linjunbin0101/biaozhu-test.git /opt/biaozhu-test && cd /opt/biaozhu-test && docker-compose up -d
+# 一键部署/更新（处理项目已存在情况）
+if [ -d "/opt/biaozhu-test" ]; then \
+    cd /opt/biaozhu-test && \
+    docker-compose down && \
+    git pull && \
+    docker-compose build --no-cache && \
+    docker-compose up -d; \
+else \
+    sudo mkdir -p /opt/biaozhu-test && \
+    sudo chown -R $USER:$USER /opt/biaozhu-test && \
+    git clone https://github.com/linjunbin0101/biaozhu-test.git /opt/biaozhu-test && \
+    cd /opt/biaozhu-test && \
+    docker-compose up -d; \
+fi
 ```
 
 服务启动后，访问：`http://服务器IP:9924`
