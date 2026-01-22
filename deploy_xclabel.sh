@@ -123,32 +123,34 @@ if [ -d "/opt/biaozhu-test" ]; then
     echo -e "${GREEN}   4.2 拉取最新代码...${NC}"
     git pull
     
-    echo -e "${GREEN}   4.3 优化Dockerfile，使用更稳定的Ubuntu 22.04镜像...${NC}"
-    # 使用更稳定的Ubuntu 22.04镜像重写Dockerfile
+    echo -e "${GREEN}   4.3 优化Dockerfile，使用更稳定的Python Bookworm镜像...${NC}"
+    # 使用更稳定的Python Bookworm镜像重写Dockerfile
     cat > Dockerfile << 'EOF'
-# 使用更稳定的Ubuntu 22.04镜像
-FROM ubuntu:22.04
+# 使用官方Python镜像作为基础镜像 (Debian Bookworm, 更稳定)
+FROM python:3.10-slim-bookworm
 
 # 设置工作目录
 WORKDIR /app
 
-# 更新apt源并安装依赖
-RUN apt-get update -y && \
-    apt-get install -y --no-install-recommends \
+# 配置apt源
+RUN echo "deb http://deb.debian.org/debian bookworm main contrib non-free" > /etc/apt/sources.list && \
+    echo "deb http://deb.debian.org/debian bookworm-updates main contrib non-free" >> /etc/apt/sources.list && \
+    echo "deb http://deb.debian.org/debian-security bookworm-security main contrib non-free" >> /etc/apt/sources.list
+
+# 安装系统依赖
+RUN apt-get update -y --fix-missing && \
+    apt-get install -y --no-install-recommends --fix-missing \
     gcc \
     libc-dev \
     libgl1 \
     libglib2.0-0 \
-    python3 \
-    python3-pip \
-    python3-venv \
     && rm -rf /var/lib/apt/lists/*
 
 # 复制requirements.txt到工作目录
 COPY requirements.txt .
 
 # 安装Python依赖
-RUN pip3 install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
 # 复制项目文件到工作目录
 COPY . .
@@ -160,7 +162,7 @@ RUN mkdir -p uploads plugins
 EXPOSE 9924
 
 # 启动命令
-CMD ["python3", "app.py"]
+CMD ["python", "app.py"]
 EOF
     
     echo -e "${GREEN}   4.4 重新构建镜像...${NC}"
@@ -180,34 +182,36 @@ else
     echo -e "${GREEN}   4.2 克隆代码...${NC}"
     git clone https://github.com/linjunbin0101/biaozhu-test.git /opt/biaozhu-test
     
-    echo -e "${GREEN}   4.3 优化Dockerfile，使用更稳定的Ubuntu 22.04镜像...${NC}"
+    echo -e "${GREEN}   4.3 优化Dockerfile，使用更稳定的Python Bookworm镜像...${NC}"
     cd /opt/biaozhu-test || exit 1
     
-    # 使用更稳定的Ubuntu 22.04镜像重写Dockerfile
+    # 使用更稳定的Python Bookworm镜像重写Dockerfile
     cat > Dockerfile << 'EOF'
-# 使用更稳定的Ubuntu 22.04镜像
-FROM ubuntu:22.04
+# 使用官方Python镜像作为基础镜像 (Debian Bookworm, 更稳定)
+FROM python:3.10-slim-bookworm
 
 # 设置工作目录
 WORKDIR /app
 
-# 更新apt源并安装依赖
-RUN apt-get update -y && \
-    apt-get install -y --no-install-recommends \
+# 配置apt源
+RUN echo "deb http://deb.debian.org/debian bookworm main contrib non-free" > /etc/apt/sources.list && \
+    echo "deb http://deb.debian.org/debian bookworm-updates main contrib non-free" >> /etc/apt/sources.list && \
+    echo "deb http://deb.debian.org/debian-security bookworm-security main contrib non-free" >> /etc/apt/sources.list
+
+# 安装系统依赖
+RUN apt-get update -y --fix-missing && \
+    apt-get install -y --no-install-recommends --fix-missing \
     gcc \
     libc-dev \
     libgl1 \
     libglib2.0-0 \
-    python3 \
-    python3-pip \
-    python3-venv \
     && rm -rf /var/lib/apt/lists/*
 
 # 复制requirements.txt到工作目录
 COPY requirements.txt .
 
 # 安装Python依赖
-RUN pip3 install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
 # 复制项目文件到工作目录
 COPY . .
@@ -219,7 +223,7 @@ RUN mkdir -p uploads plugins
 EXPOSE 9924
 
 # 启动命令
-CMD ["python3", "app.py"]
+CMD ["python", "app.py"]
 EOF
     
     echo -e "${GREEN}   4.4 启动服务...${NC}"

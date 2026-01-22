@@ -4,8 +4,14 @@ FROM python:3.10-slim-bookworm
 # 设置工作目录
 WORKDIR /app
 
-# 安装系统依赖
-RUN apt-get update -y && apt-get install -y --no-install-recommends \
+# 配置apt源为国内镜像以提高下载速度和可靠性
+RUN echo "deb http://deb.debian.org/debian bookworm main contrib non-free" > /etc/apt/sources.list && \
+    echo "deb http://deb.debian.org/debian bookworm-updates main contrib non-free" >> /etc/apt/sources.list && \
+    echo "deb http://deb.debian.org/debian-security bookworm-security main contrib non-free" >> /etc/apt/sources.list
+
+# 安装系统依赖，添加--fix-missing和--allow-unauthenticated选项处理可能的问题
+RUN apt-get update -y --fix-missing && \
+    apt-get install -y --no-install-recommends --fix-missing \
     gcc \
     libc-dev \
     libgl1 \
