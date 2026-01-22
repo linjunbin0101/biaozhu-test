@@ -9,8 +9,8 @@
 如果您的服务器已安装Docker和Docker Compose，只需运行以下**单条命令**即可完成部署：
 
 ```bash
-# 拉取代码并部署（一键完成）
-git clone https://github.com/linjunbin0101/biaozhu-test.git && cd biaozhu-test && docker-compose up -d
+# 拉取代码到/opt路径并部署（一键完成）
+git clone https://github.com/linjunbin0101/biaozhu-test.git /opt/biaozhu-test && cd /opt/biaozhu-test && docker-compose up -d
 ```
 
 服务启动后，访问：`http://服务器IP:9924`
@@ -180,7 +180,7 @@ docker-compose build --no-cache
 部署后，项目目录结构如下：
 
 ```
-xclabel/
+/opt/biaozhu-test/
 ├── uploads/          # 上传的图片和视频存储目录（持久化）
 ├── plugins/          # 插件目录，用于YOLO11安装（持久化）
 ├── static/           # 静态资源目录
@@ -246,7 +246,7 @@ environment:
 
 ```bash
 # 进入项目目录
-cd ~/xclabel
+cd /opt/biaozhu-test
 
 # 拉取最新代码
 git pull
