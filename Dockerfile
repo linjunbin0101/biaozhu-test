@@ -1,11 +1,11 @@
-# 使用官方Python镜像作为基础镜像
-FROM python:3.10-slim
+# 使用官方Python镜像作为基础镜像 (Debian Bookworm, 更稳定)
+FROM python:3.10-slim-bookworm
 
 # 设置工作目录
 WORKDIR /app
 
 # 安装系统依赖
-RUN apt-get update && apt-get install -y \
+RUN apt-get update -y && apt-get install -y --no-install-recommends \
     gcc \
     libc-dev \
     libgl1 \
