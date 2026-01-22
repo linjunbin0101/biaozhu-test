@@ -123,10 +123,14 @@ if [ -d "/opt/biaozhu-test" ]; then
     echo -e "${GREEN}   4.2 拉取最新代码...${NC}"
     git pull
     
-    echo -e "${GREEN}   4.3 重新构建镜像...${NC}"
+    echo -e "${GREEN}   4.3 修复Dockerfile中的依赖问题...${NC}"
+    # 修复libgl1-mesa-glx依赖问题，替换为libgl1
+    sed -i 's/libgl1-mesa-glx/libgl1/g' Dockerfile
+    
+    echo -e "${GREEN}   4.4 重新构建镜像...${NC}"
     docker-compose build --no-cache
     
-    echo -e "${GREEN}   4.4 启动服务...${NC}"
+    echo -e "${GREEN}   4.5 启动服务...${NC}"
     docker-compose up -d
     
     echo -e "${GREEN}更新完成！${NC}"
@@ -140,8 +144,12 @@ else
     echo -e "${GREEN}   4.2 克隆代码...${NC}"
     git clone https://github.com/linjunbin0101/biaozhu-test.git /opt/biaozhu-test
     
-    echo -e "${GREEN}   4.3 启动服务...${NC}"
+    echo -e "${GREEN}   4.3 修复Dockerfile中的依赖问题...${NC}"
     cd /opt/biaozhu-test || exit 1
+    # 修复libgl1-mesa-glx依赖问题，替换为libgl1
+    sed -i 's/libgl1-mesa-glx/libgl1/g' Dockerfile
+    
+    echo -e "${GREEN}   4.4 启动服务...${NC}"
     docker-compose up -d
     
     echo -e "${GREEN}部署完成！${NC}"
