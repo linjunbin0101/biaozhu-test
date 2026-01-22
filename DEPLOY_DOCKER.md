@@ -6,7 +6,18 @@
 
 ### 一键部署（推荐）
 
-如果您的服务器已安装Docker和Docker Compose，只需运行以下**单条命令**即可完成部署或更新：
+#### 方法1：使用一键部署脚本（最简便）
+
+使用我们提供的`deploy_xclabel.sh`脚本，只需一条命令即可完成所有部署工作，包括安装Docker、Docker Compose和Git（如果未安装）：
+
+```bash
+# 下载并运行一键部署脚本
+curl -fsSL https://raw.githubusercontent.com/linjunbin0101/biaozhu-test/master/deploy_xclabel.sh -o deploy_xclabel.sh && chmod +x deploy_xclabel.sh && ./deploy_xclabel.sh
+```
+
+#### 方法2：使用命令行部署
+
+如果您的服务器已安装Docker和Docker Compose，也可以直接使用以下命令部署或更新：
 
 ```bash
 # 一键部署/更新（处理项目已存在情况）
