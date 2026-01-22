@@ -2,6 +2,21 @@
 
 本指南将指导您如何在Ubuntu服务器上使用Docker和Docker Compose一键部署xclabel图像标注工具。
 
+## 🚀 快速开始
+
+### 一键部署（推荐）
+
+如果您的服务器已安装Docker和Docker Compose，只需运行以下命令即可完成部署：
+
+```bash
+# 拉取代码并部署
+git clone https://github.com/linjunbin0101/biaozhu-test.git
+cd biaozhu-test
+docker-compose up -d
+```
+
+服务启动后，访问：`http://服务器IP:9924`
+
 ## 前提条件
 
 在开始部署之前，请确保您的Ubuntu服务器满足以下条件：
@@ -10,9 +25,9 @@
 2. **Docker**：已安装Docker 20.10+版本
 3. **Docker Compose**：已安装Docker Compose 1.29+版本
 4. **网络访问**：服务器需开放9924端口，或您计划使用的自定义端口
-5. **Git**（可选）：用于克隆仓库
+5. **Git**：用于克隆仓库
 
-## 安装Docker和Docker Compose
+## 🔧 安装Docker和Docker Compose
 
 如果您的服务器尚未安装Docker和Docker Compose，请按照以下步骤安装：
 
