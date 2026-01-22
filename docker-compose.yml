@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  xclabel:
+    build: .
+    container_name: xclabel
+    ports:
+      - "9924:9924"
+    volumes:
+      - ./uploads:/app/uploads
+      - ./plugins:/app/plugins
+      - ./static:/app/static
+    restart: unless-stopped
+    environment:
+      - TZ=Asia/Shanghai
+    command: python app.py --host 0.0.0.0 --port 9924
