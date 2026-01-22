@@ -123,9 +123,45 @@ if [ -d "/opt/biaozhu-test" ]; then
     echo -e "${GREEN}   4.2 拉取最新代码...${NC}"
     git pull
     
-    echo -e "${GREEN}   4.3 修复Dockerfile中的依赖问题...${NC}"
-    # 修复libgl1-mesa-glx依赖问题，替换为libgl1
-    sed -i 's/libgl1-mesa-glx/libgl1/g' Dockerfile
+    echo -e "${GREEN}   4.3 优化Dockerfile，使用更稳定的Ubuntu 22.04镜像...${NC}"
+    # 使用更稳定的Ubuntu 22.04镜像重写Dockerfile
+    cat > Dockerfile << 'EOF'
+# 使用更稳定的Ubuntu 22.04镜像
+FROM ubuntu:22.04
+
+# 设置工作目录
+WORKDIR /app
+
+# 更新apt源并安装依赖
+RUN apt-get update -y && \
+    apt-get install -y --no-install-recommends \
+    gcc \
+    libc-dev \
+    libgl1 \
+    libglib2.0-0 \
+    python3 \
+    python3-pip \
+    python3-venv \
+    && rm -rf /var/lib/apt/lists/*
+
+# 复制requirements.txt到工作目录
+COPY requirements.txt .
+
+# 安装Python依赖
+RUN pip3 install --no-cache-dir -r requirements.txt
+
+# 复制项目文件到工作目录
+COPY . .
+
+# 创建必要的目录
+RUN mkdir -p uploads plugins
+
+# 暴露端口
+EXPOSE 9924
+
+# 启动命令
+CMD ["python3", "app.py"]
+EOF
     
     echo -e "${GREEN}   4.4 重新构建镜像...${NC}"
     docker-compose build --no-cache
@@ -144,10 +180,47 @@ else
     echo -e "${GREEN}   4.2 克隆代码...${NC}"
     git clone https://github.com/linjunbin0101/biaozhu-test.git /opt/biaozhu-test
     
-    echo -e "${GREEN}   4.3 修复Dockerfile中的依赖问题...${NC}"
+    echo -e "${GREEN}   4.3 优化Dockerfile，使用更稳定的Ubuntu 22.04镜像...${NC}"
     cd /opt/biaozhu-test || exit 1
-    # 修复libgl1-mesa-glx依赖问题，替换为libgl1
-    sed -i 's/libgl1-mesa-glx/libgl1/g' Dockerfile
+    
+    # 使用更稳定的Ubuntu 22.04镜像重写Dockerfile
+    cat > Dockerfile << 'EOF'
+# 使用更稳定的Ubuntu 22.04镜像
+FROM ubuntu:22.04
+
+# 设置工作目录
+WORKDIR /app
+
+# 更新apt源并安装依赖
+RUN apt-get update -y && \
+    apt-get install -y --no-install-recommends \
+    gcc \
+    libc-dev \
+    libgl1 \
+    libglib2.0-0 \
+    python3 \
+    python3-pip \
+    python3-venv \
+    && rm -rf /var/lib/apt/lists/*
+
+# 复制requirements.txt到工作目录
+COPY requirements.txt .
+
+# 安装Python依赖
+RUN pip3 install --no-cache-dir -r requirements.txt
+
+# 复制项目文件到工作目录
+COPY . .
+
+# 创建必要的目录
+RUN mkdir -p uploads plugins
+
+# 暴露端口
+EXPOSE 9924
+
+# 启动命令
+CMD ["python3", "app.py"]
+EOF
     
     echo -e "${GREEN}   4.4 启动服务...${NC}"
     docker-compose up -d
