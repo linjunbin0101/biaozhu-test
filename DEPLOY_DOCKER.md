@@ -6,13 +6,11 @@
 
 ### 一键部署（推荐）
 
-如果您的服务器已安装Docker和Docker Compose，只需运行以下命令即可完成部署：
+如果您的服务器已安装Docker和Docker Compose，只需运行以下**单条命令**即可完成部署：
 
 ```bash
-# 拉取代码并部署
-git clone https://github.com/linjunbin0101/biaozhu-test.git
-cd biaozhu-test
-docker-compose up -d
+# 拉取代码并部署（一键完成）
+git clone https://github.com/linjunbin0101/biaozhu-test.git && cd biaozhu-test && docker-compose up -d
 ```
 
 服务启动后，访问：`http://服务器IP:9924`
