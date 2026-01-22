@@ -65,22 +65,22 @@ RUN set -eux; \
     echo 'deb http://deb.debian.org/debian bookworm-updates main contrib non-free' >> /etc/apt/sources.list; \
     echo 'deb http://deb.debian.org/debian-security bookworm-security main contrib non-free' >> /etc/apt/sources.list; \
     \
-    # 重试机制：最多尝试3次apt-get update
+    # 重试机制：最多尝试3次apt update
     for i in {1..3}; do \
-        if apt-get update -y --fix-missing; then \
+        if apt update -y --fix-missing; then \
             break; \
         fi; \
         if [ $i -eq 3 ]; then \
             echo 'Failed to update apt after 3 attempts'; \
             exit 1; \
         fi; \
-        echo 'Retrying apt-get update...'; \
+        echo 'Retrying apt update...'; \
         sleep 2; \
     done; \
     \
-    # 重试机制：最多尝试3次apt-get install
+    # 重试机制：最多尝试3次apt install
     for i in {1..3}; do \
-        if apt-get install -y --no-install-recommends --fix-missing \
+        if apt install -y --no-install-recommends --fix-missing \
             gcc \
             libc-dev \
             libgl1 \
@@ -91,12 +91,13 @@ RUN set -eux; \
             echo 'Failed to install packages after 3 attempts'; \
             exit 1; \
         fi; \
-        echo 'Retrying apt-get install...'; \
+        echo 'Retrying apt install...'; \
         sleep 2; \
     done; \
     \
-    # 清理apt缓存
-    rm -rf /var/lib/apt/lists/*
+    # 清理apt缓存和临时文件，减少镜像大小
+    apt clean; \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # 复制requirements.txt到工作目录
 COPY requirements.txt .

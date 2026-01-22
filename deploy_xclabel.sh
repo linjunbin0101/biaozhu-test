@@ -138,13 +138,14 @@ RUN echo "deb http://deb.debian.org/debian bookworm main contrib non-free" > /et
     echo "deb http://deb.debian.org/debian-security bookworm-security main contrib non-free" >> /etc/apt/sources.list
 
 # 安装系统依赖
-RUN apt-get update -y --fix-missing && \
-    apt-get install -y --no-install-recommends --fix-missing \
+RUN set -eux; \
+    apt update -y --fix-missing && \
+    apt install -y --no-install-recommends --fix-missing \
     gcc \
     libc-dev \
     libgl1 \
     libglib2.0-0 \
-    && rm -rf /var/lib/apt/lists/*
+    && apt clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # 复制requirements.txt到工作目录
 COPY requirements.txt .
@@ -199,13 +200,14 @@ RUN echo "deb http://deb.debian.org/debian bookworm main contrib non-free" > /et
     echo "deb http://deb.debian.org/debian-security bookworm-security main contrib non-free" >> /etc/apt/sources.list
 
 # 安装系统依赖
-RUN apt-get update -y --fix-missing && \
-    apt-get install -y --no-install-recommends --fix-missing \
+RUN set -eux; \
+    apt update -y --fix-missing && \
+    apt install -y --no-install-recommends --fix-missing \
     gcc \
     libc-dev \
     libgl1 \
     libglib2.0-0 \
-    && rm -rf /var/lib/apt/lists/*
+    && apt clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # 复制requirements.txt到工作目录
 COPY requirements.txt .
