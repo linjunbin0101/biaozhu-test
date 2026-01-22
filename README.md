@@ -23,11 +23,6 @@ xclabel是一款功能强大的开源图像标注工具，采用Python+Flask开�
 - 标注数据安全存储
 - 完善的目录自动创建机制
 
-### 软件截图
-<img width="720" alt="1" src="https://gitee.com/Vanishi/images/raw/master/xclabel/v2.1/1.png">
-<img width="720" alt="2" src="https://gitee.com/Vanishi/images/raw/master/xclabel/v2.1/2.png">
-<img width="720" alt="3" src="https://gitee.com/Vanishi/images/raw/master/xclabel/v2.1/3.png">
-
 ### 版本历史
 
 查看完整的版本更新记录，请参考 [CHANGELOG.md](CHANGELOG.md)
