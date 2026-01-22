@@ -83,9 +83,34 @@ else
     echo -e "${GREEN}Git已安装，版本：$(git --version)${NC}"
 fi
 
+# 检查并开放9924端口
+echo -e ""
+echo -e "${GREEN}4. 检查并开放9924端口...${NC}"
+
+# 检查ufw是否安装
+if command -v ufw &> /dev/null; then
+    echo -e "${GREEN}   4.1 检测到ufw已安装，检查9924端口状态...${NC}"
+    
+    # 检查ufw是否启用
+    if sudo ufw status | grep -q "Status: active"; then
+        # 检查9924端口是否已开放
+        if ! sudo ufw status | grep -q "9924"; then
+            echo -e "${YELLOW}   4.2 9924端口未开放，正在开放...${NC}"
+            sudo ufw allow 9924/tcp
+            echo -e "${GREEN}   4.3 9924端口已成功开放${NC}"
+        else
+            echo -e "${GREEN}   4.2 9924端口已开放${NC}"
+        fi
+    else
+        echo -e "${YELLOW}   4.1 ufw已安装但未启用，跳过端口开放步骤${NC}"
+    fi
+else
+    echo -e "${YELLOW}   4.1 ufw未安装，跳过端口开放步骤${NC}"
+fi
+
 # 部署或更新xclabel
 echo -e ""
-echo -e "${GREEN}4. 部署/更新xclabel...${NC}"
+echo -e "${GREEN}5. 部署/更新xclabel...${NC}"
 
 if [ -d "/opt/biaozhu-test" ]; then
     echo -e "${YELLOW}检测到项目已存在，正在更新...${NC}"
