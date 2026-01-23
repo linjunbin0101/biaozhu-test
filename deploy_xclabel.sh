@@ -1,9 +1,11 @@
 #!/bin/bash
 
 # xclabel一键部署脚本
-# 支持首次部署和后续更新
-# 自动处理Docker和Docker Compose安装
-# 自动处理权限问题
+# 支持在任何目录执行
+# 如果项目存在则先删除再拉取
+# 自动更新Docker镜像加速器
+# 自动重启Docker服务
+# 自动清除缓存并重新构建运行
 
 # 定义颜色
 GREEN='\033[0;32m'
@@ -15,6 +17,12 @@ echo -e "${GREEN}=======================================${NC}"
 echo -e "${GREEN}xclabel 图像标注工具一键部署脚本${NC}"
 echo -e "${GREEN}=======================================${NC}"
 echo -e ""
+
+# 检查是否有sudo权限
+if ! sudo -n true 2>/dev/null; then
+    echo -e "${RED}错误：您需要具有sudo权限才能运行此脚本${NC}"
+    exit 1
+fi
 
 # 检查是否为root用户
 if [ "$EUID" -eq 0 ]; then
@@ -51,7 +59,7 @@ if ! command -v docker &> /dev/null; then
     
     echo -e "${GREEN}Docker安装完成！${NC}"
 else
-    echo -e "${GREEN}Docker已安装，版本：$(docker --version)${NC}"
+    echo -e "${GREEN}Docker已安装，版本：$(sudo docker --version)${NC}"
 fi
 
 # 检查并安装Docker Compose
@@ -68,7 +76,7 @@ if ! command -v docker-compose &> /dev/null; then
     
     echo -e "${GREEN}Docker Compose安装完成！${NC}"
 else
-    echo -e "${GREEN}Docker Compose已安装，版本：$(docker-compose --version)${NC}"
+    echo -e "${GREEN}Docker Compose已安装，版本：$(sudo docker-compose --version)${NC}"
 fi
 
 # 检查并安装Git
@@ -80,7 +88,7 @@ if ! command -v git &> /dev/null; then
     sudo apt-get install -y git
     echo -e "${GREEN}Git安装完成！${NC}"
 else
-    echo -e "${GREEN}Git已安装，版本：$(git --version)${NC}"
+    echo -e "${GREEN}Git已安装，版本：$(sudo git --version)${NC}"
 fi
 
 # 检查并开放9924端口
@@ -108,131 +116,108 @@ else
     echo -e "${YELLOW}   4.1 ufw未安装，跳过端口开放步骤${NC}"
 fi
 
-# 部署或更新xclabel
+# 更新/etc/docker/daemon.json
 echo -e ""
-echo -e "${GREEN}5. 部署/更新xclabel...${NC}"
+echo -e "${GREEN}5. 更新Docker镜像加速器配置...${NC}"
 
+# 备份原有配置
+sudo cp /etc/docker/daemon.json /etc/docker/daemon.json.bak 2>/dev/null || echo -e "${YELLOW}原有配置文件不存在，将创建新配置文件...${NC}"
+
+# 更新daemon.json配置
+echo '{"registry-mirrors": ["https://docker.m.daocloud.io"]}' | sudo tee /etc/docker/daemon.json > /dev/null
+
+echo -e "${GREEN}6. 重启Docker服务...${NC}"
+sudo systemctl daemon-reload
+sudo systemctl restart docker
+
+# 等待Docker服务重启
+sleep 5
+
+# 部署xclabel
+echo -e ""
+echo -e "${GREEN}7. 部署xclabel...${NC}"
+
+# 如果项目已存在，先删除
 if [ -d "/opt/biaozhu-test" ]; then
-    echo -e "${YELLOW}检测到项目已存在，正在更新...${NC}"
+    echo -e "${YELLOW}检测到项目已存在，正在删除...${NC}"
     
-    cd /opt/biaozhu-test || exit 1
+    # 停止并删除容器
+    if sudo docker-compose -f /opt/biaozhu-test/docker-compose.yml ps -q > /dev/null 2>&1; then
+        sudo docker-compose -f /opt/biaozhu-test/docker-compose.yml down -v
+    fi
     
-    echo -e "${GREEN}   4.1 停止当前服务...${NC}"
-    docker-compose down
-    
-    echo -e "${GREEN}   4.2 拉取最新代码...${NC}"
-    git pull
-    
-    echo -e "${GREEN}   4.3 优化Dockerfile，使用更稳定的Python Bookworm镜像...${NC}"
-    # 使用更稳定的Python Bullseye镜像重写Dockerfile
-    cat > Dockerfile << 'EOF'
-# 使用官方Python镜像作为基础镜像 (Debian Bullseye, 更稳定)
-FROM python:3.10-slim-bullseye
-
-# 设置工作目录
-WORKDIR /app
-
-# 配置apt源
-RUN echo "deb http://deb.debian.org/debian bullseye main contrib non-free" > /etc/apt/sources.list && \
-    echo "deb http://deb.debian.org/debian bullseye-updates main contrib non-free" >> /etc/apt/sources.list && \
-    echo "deb http://deb.debian.org/debian-security bullseye-security main contrib non-free" >> /etc/apt/sources.list
-
-# 安装系统依赖
-RUN set -eux; \
-    apt update -y --fix-missing && \
-    apt install -y --no-install-recommends --fix-missing \
-    gcc \
-    libc-dev \
-    libgl1 \
-    libglib2.0-0 \
-    && apt clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
-
-# 复制requirements.txt到工作目录
-COPY requirements.txt .
-
-# 安装Python依赖
-RUN pip install --no-cache-dir -r requirements.txt
-
-# 复制项目文件到工作目录
-COPY . .
-
-# 创建必要的目录
-RUN mkdir -p uploads plugins
-
-# 暴露端口
-EXPOSE 9924
-
-# 启动命令
-CMD ["python", "app.py"]
-EOF
-    
-    echo -e "${GREEN}   4.4 重新构建镜像...${NC}"
-    docker-compose build --no-cache
-    
-    echo -e "${GREEN}   4.5 启动服务...${NC}"
-    docker-compose up -d
-    
-    echo -e "${GREEN}更新完成！${NC}"
-else
-    echo -e "${YELLOW}检测到项目不存在，正在部署...${NC}"
-    
-    echo -e "${GREEN}   4.1 创建项目目录...${NC}"
-    sudo mkdir -p /opt/biaozhu-test
-    sudo chown -R $USER:$USER /opt/biaozhu-test
-    
-    echo -e "${GREEN}   4.2 克隆代码...${NC}"
-    git clone https://github.com/linjunbin0101/biaozhu-test.git /opt/biaozhu-test
-    
-    echo -e "${GREEN}   4.3 优化Dockerfile，使用更稳定的Python Bookworm镜像...${NC}"
-    cd /opt/biaozhu-test || exit 1
-    
-    # 使用更稳定的Python Bullseye镜像重写Dockerfile
-    cat > Dockerfile << 'EOF'
-# 使用官方Python镜像作为基础镜像 (Debian Bullseye, 更稳定)
-FROM python:3.10-slim-bullseye
-
-# 设置工作目录
-WORKDIR /app
-
-# 配置apt源
-RUN echo "deb http://deb.debian.org/debian bullseye main contrib non-free" > /etc/apt/sources.list && \
-    echo "deb http://deb.debian.org/debian bullseye-updates main contrib non-free" >> /etc/apt/sources.list && \
-    echo "deb http://deb.debian.org/debian-security bullseye-security main contrib non-free" >> /etc/apt/sources.list
-
-# 安装系统依赖
-RUN set -eux; \
-    apt update -y --fix-missing && \
-    apt install -y --no-install-recommends --fix-missing \
-    gcc \
-    libc-dev \
-    libgl1 \
-    libglib2.0-0 \
-    && apt clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
-
-# 复制requirements.txt到工作目录
-COPY requirements.txt .
-
-# 安装Python依赖
-RUN pip install --no-cache-dir -r requirements.txt
-
-# 复制项目文件到工作目录
-COPY . .
-
-# 创建必要的目录
-RUN mkdir -p uploads plugins
-
-# 暴露端口
-EXPOSE 9924
-
-# 启动命令
-CMD ["python", "app.py"]
-EOF
-    
-    echo -e "${GREEN}   4.4 启动服务...${NC}"
-    docker-compose up -d
-    
-    echo -e "${GREEN}部署完成！${NC}"
+    # 删除项目目录
+    sudo rm -rf /opt/biaozhu-test
 fi
+
+# 重新克隆代码
+echo -e "${GREEN}8. 克隆代码到/opt/目录...${NC}"
+sudo mkdir -p /opt/biaozhu-test
+sudo chown -R $USER:$USER /opt/biaozhu-test
+sudo git clone https://github.com/linjunbin0101/biaozhu-test.git /opt/biaozhu-test
+
+# 进入项目目录
+cd /opt/biaozhu-test || exit 1
+
+echo -e "${GREEN}9. 修复app.py，添加allow_unsafe_werkzeug=True参数...${NC}"
+# 修改app.py文件，添加allow_unsafe_werkzeug=True参数
+sudo sed -i 's/socketio.run(app, debug=args.debug, host=args.host, port=args.port)/socketio.run(app, debug=args.debug, host=args.host, port=args.port, allow_unsafe_werkzeug=True)/g' app.py
+
+echo -e "${GREEN}10. 优化Dockerfile，使用更稳定的Python Bullseye镜像...${NC}"
+# 使用更稳定的Python Bullseye镜像重写Dockerfile
+sudo cat > Dockerfile << 'EOF'
+# 使用官方Python镜像作为基础镜像 (Debian Bullseye, 更稳定)
+FROM python:3.10-slim-bullseye
+
+# 设置工作目录
+WORKDIR /app
+
+# 配置apt源
+RUN echo "deb http://deb.debian.org/debian bullseye main contrib non-free" > /etc/apt/sources.list && \
+    echo "deb http://deb.debian.org/debian bullseye-updates main contrib non-free" >> /etc/apt/sources.list && \
+    echo "deb http://deb.debian.org/debian-security bullseye-security main contrib non-free" >> /etc/apt/sources.list
+
+# 安装系统依赖
+RUN set -eux; \
+    apt update -y --fix-missing && \
+    apt install -y --no-install-recommends --fix-missing \
+    gcc \
+    libc-dev \
+    libgl1 \
+    libglib2.0-0 \
+    && apt clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+# 复制requirements.txt到工作目录
+COPY requirements.txt .
+
+# 安装Python依赖
+RUN pip install --no-cache-dir -r requirements.txt
+
+# 复制项目文件到工作目录
+COPY . .
+
+# 创建必要的目录
+RUN mkdir -p uploads plugins
+
+# 暴露端口
+EXPOSE 9924
+
+# 启动命令
+CMD ["python", "app.py"]
+EOF
+
+echo -e "${GREEN}11. 清除Docker缓存...${NC}"
+sudo docker system prune -f
+sudo docker volume prune -f
+sudo docker network prune -f
+sudo docker image prune -f
+echo -e "${GREEN}12. 重新构建镜像...${NC}"
+sudo docker-compose build --no-cache
+
+echo -e "${GREEN}13. 启动服务...${NC}"
+sudo docker-compose up -d
+
+echo -e "${GREEN}部署完成！${NC}"
 
 echo -e ""
 echo -e "${GREEN}=======================================${NC}"
