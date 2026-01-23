@@ -15,9 +15,9 @@ echo -e "${GREEN}=======================================${NC}"
 echo -e ""
 
 # 检查项目目录
-if [ -d "/opt/xclabel" ]; then
+if [ -d "/opt/biaozhu-test" ]; then
     echo -e "${GREEN}1. 检测到项目已存在，进入项目目录...${NC}"
-    cd /opt/xclabel
+    cd /opt/biaozhu-test
 else
     echo -e "${RED}1. 项目目录不存在，请先运行部署脚本！${NC}"
     exit 1

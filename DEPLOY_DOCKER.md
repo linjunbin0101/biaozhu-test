@@ -21,17 +21,17 @@ curl -fsSL https://raw.githubusercontent.com/linjunbin0101/biaozhu-test/master/d
 
 ```bash
 # 一键部署/更新（处理项目已存在情况）
-if [ -d "/opt/xclabel" ]; then \
-    cd /opt/xclabel && \
+if [ -d "/opt/biaozhu-test" ]; then \
+    cd /opt/biaozhu-test && \
     docker-compose down && \
     git pull && \
     docker-compose build --no-cache && \
     docker-compose up -d; \
 else \
-    sudo mkdir -p /opt/xclabel && \
-    sudo chown -R $USER:$USER /opt/xclabel && \
-    git clone https://gitee.com/Vanishi/xclabel.git /opt/xclabel && \
-    cd /opt/xclabel && \
+    sudo mkdir -p /opt/biaozhu-test && \
+    sudo chown -R $USER:$USER /opt/biaozhu-test && \
+    git clone https://github.com/linjunbin0101/biaozhu-test.git /opt/biaozhu-test && \
+    cd /opt/biaozhu-test && \
     docker-compose up -d; \
 fi
 ```
@@ -100,8 +100,8 @@ curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o 
 
 ```bash
 # 克隆仓库到本地
- git clone https://gitee.com/Vanishi/xclabel.git
- cd xclabel
+ git clone https://github.com/linjunbin0101/biaozhu-test.git
+ cd biaozhu-test
 ```
 
 2. **启动服务**
@@ -124,14 +124,14 @@ curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o 
 
 ```bash
 # 下载必要的项目文件
- curl -O https://gitee.com/Vanishi/xclabel/raw/master/Dockerfile
- curl -O https://gitee.com/Vanishi/xclabel/raw/master/docker-compose.yml
- curl -O https://gitee.com/Vanishi/xclabel/raw/master/requirements.txt
- curl -O https://gitee.com/Vanishi/xclabel/raw/master/app.py
- curl -O https://gitee.com/Vanishi/xclabel/raw/master/AiUtils.py
+ curl -O https://raw.githubusercontent.com/linjunbin0101/biaozhu-test/master/Dockerfile
+ curl -O https://raw.githubusercontent.com/linjunbin0101/biaozhu-test/master/docker-compose.yml
+ curl -O https://raw.githubusercontent.com/linjunbin0101/biaozhu-test/master/requirements.txt
+ curl -O https://raw.githubusercontent.com/linjunbin0101/biaozhu-test/master/app.py
+ curl -O https://raw.githubusercontent.com/linjunbin0101/biaozhu-test/master/AiUtils.py
 
 # 下载目录结构
- git clone --depth=1 --filter=blob:none --no-checkout https://gitee.com/Vanishi/xclabel.git .
+ git clone --depth=1 --filter=blob:none --no-checkout https://github.com/linjunbin0101/biaozhu-test.git .
  git checkout master -- static/ templates/
 ```
 
@@ -203,7 +203,7 @@ docker-compose build --no-cache
 部署后，项目目录结构如下：
 
 ```
-/opt/xclabel/
+/opt/biaozhu-test/
 ├── uploads/          # 上传的图片和视频存储目录（持久化）
 ├── plugins/          # 插件目录，用于YOLO11安装（持久化）
 ├── static/           # 静态资源目录
@@ -269,7 +269,7 @@ environment:
 
 ```bash
 # 进入项目目录
-cd /opt/xclabel
+cd /opt/biaozhu-test
 
 # 拉取最新代码
 git pull
