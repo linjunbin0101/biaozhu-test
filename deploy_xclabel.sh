@@ -5,7 +5,11 @@
 # 如果项目存在则先删除再拉取
 # 自动更新Docker镜像加速器
 # 自动重启Docker服务
-# 自动清除缓存并重新构建运行
+# 可选择是否清除缓存并重新构建运行
+
+# 参数说明
+# -c, --clean: 清除Docker缓存并使用--no-cache构建
+# -h, --help: 显示帮助信息
 
 # 定义颜色
 GREEN='\033[0;32m'
@@ -13,9 +17,46 @@ YELLOW='\033[1;33m'
 RED='\033[0;31m'
 NC='\033[0m' # No Color
 
+# 默认不清除缓存
+CLEAN=false
+
+# 解析命令行参数
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        -c|--clean)
+            CLEAN=true
+            shift
+            ;;
+        -h|--help)
+            echo -e "${GREEN}xclabel 图像标注工具一键部署脚本${NC}"
+            echo -e ""
+            echo -e "${YELLOW}Usage:${NC} $0 [OPTIONS]"
+            echo -e ""
+            echo -e "${YELLOW}Options:${NC}"
+            echo -e "  -c, --clean   清除Docker缓存并使用--no-cache构建"
+            echo -e "  -h, --help    显示帮助信息"
+            echo -e ""
+            exit 0
+            ;;
+        *)
+            echo -e "${RED}错误：未知参数 '$1'${NC}"
+            echo -e "使用 '$0 --help' 查看帮助信息"
+            exit 1
+            ;;
+    esac
+done
+
 echo -e "${GREEN}=======================================${NC}"
 echo -e "${GREEN}xclabel 图像标注工具一键部署脚本${NC}"
 echo -e "${GREEN}=======================================${NC}"
+echo -e ""
+
+# 显示当前模式
+if [ "$CLEAN" = true ]; then
+    echo -e "${YELLOW}当前模式：清除缓存并重新构建${NC}"
+else
+    echo -e "${YELLOW}当前模式：保留缓存构建（推荐）${NC}"
+fi
 echo -e ""
 
 # 检查是否有sudo权限
@@ -206,13 +247,21 @@ EXPOSE 9924
 CMD ["python", "app.py"]
 EOF
 
-echo -e "${GREEN}11. 清除Docker缓存...${NC}"
-sudo docker system prune -f
-sudo docker volume prune -f
-sudo docker network prune -f
-sudo docker image prune -f
-echo -e "${GREEN}12. 重新构建镜像...${NC}"
-sudo docker-compose build --no-cache
+# 清理Docker缓存（可选）
+if [ "$CLEAN" = true ]; then
+    echo -e "${GREEN}11. 清除Docker缓存...${NC}"
+    sudo docker system prune -f
+    sudo docker volume prune -f
+    sudo docker network prune -f
+    sudo docker image prune -f
+    echo -e "${GREEN}12. 重新构建镜像（无缓存）...${NC}"
+    sudo docker-compose build --no-cache
+else
+    echo -e "${GREEN}11. 清理未使用的Docker镜像...${NC}"
+    sudo docker image prune -f
+    echo -e "${GREEN}12. 重新构建镜像（使用缓存）...${NC}"
+    sudo docker-compose build
+fi
 
 echo -e "${GREEN}13. 启动服务...${NC}"
 sudo docker-compose up -d

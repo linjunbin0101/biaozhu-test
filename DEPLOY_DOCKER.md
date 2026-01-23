@@ -11,9 +11,28 @@
 使用我们提供的`deploy_xclabel.sh`脚本，只需一条命令即可完成所有部署工作，包括安装Docker、Docker Compose和Git（如果未安装）：
 
 ```bash
-# 下载并运行一键部署脚本（包含sudo权限）
+# 下载并运行一键部署脚本（包含sudo权限，默认保留缓存）
 sudo bash -c "curl -fsSL https://raw.githubusercontent.com/linjunbin0101/biaozhu-test/master/deploy_xclabel.sh | bash"
 ```
+
+### 脚本参数
+
+脚本支持以下参数：
+
+```bash
+# 显示帮助信息
+sudo bash -c "curl -fsSL https://raw.githubusercontent.com/linjunbin0101/biaozhu-test/master/deploy_xclabel.sh | bash -s -- --help"
+
+# 清除Docker缓存并使用--no-cache构建（首次部署或依赖变化时推荐）
+sudo bash -c "curl -fsSL https://raw.githubusercontent.com/linjunbin0101/biaozhu-test/master/deploy_xclabel.sh | bash -s -- -c"
+sudo bash -c "curl -fsSL https://raw.githubusercontent.com/linjunbin0101/biaozhu-test/master/deploy_xclabel.sh | bash -s -- --clean"
+```
+
+### 参数说明
+
+- `-c, --clean`：清除Docker缓存并使用`--no-cache`构建，适合首次部署或依赖发生重大变化时
+- `-h, --help`：显示帮助信息
+- 默认（无参数）：保留缓存构建，适合日常更新和小改动，构建速度更快
 
 #### 方法2：使用命令行部署
 
@@ -25,8 +44,8 @@ if [ -d "/opt/biaozhu-test" ]; then \
     cd /opt/biaozhu-test && \
     sudo docker-compose down && \
     sudo git pull && \
-    sudo docker-compose build --no-cache && \
-    sudo sudo docker-compose up -d; \
+    sudo docker-compose build && \
+    sudo docker-compose up -d; \
 else \
     sudo mkdir -p /opt/biaozhu-test && \
     sudo chown -R $USER:$USER /opt/biaozhu-test && \
