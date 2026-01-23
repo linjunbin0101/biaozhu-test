@@ -24,19 +24,19 @@ else
 fi
 
 # 修复Dockerfile
-echo -e "${GREEN}2. 修复Dockerfile，使用更稳定的Python Bookworm镜像...${NC}"
+echo -e "${GREEN}2. 修复Dockerfile，使用更稳定的Python Bullseye镜像...${NC}"
 
 cat > Dockerfile << 'EOF'
-# 使用官方Python镜像作为基础镜像 (Debian Bookworm, 更稳定)
-FROM python:3.10-slim-bookworm
+# 使用官方Python镜像作为基础镜像 (Debian Bullseye, 更稳定)
+FROM python:3.10-slim-bullseye
 
 # 设置工作目录
 WORKDIR /app
 
 # 配置apt源
-RUN echo "deb http://deb.debian.org/debian bookworm main contrib non-free" > /etc/apt/sources.list && \
-    echo "deb http://deb.debian.org/debian bookworm-updates main contrib non-free" >> /etc/apt/sources.list && \
-    echo "deb http://deb.debian.org/debian-security bookworm-security main contrib non-free" >> /etc/apt/sources.list
+RUN echo "deb http://deb.debian.org/debian bullseye main contrib non-free" > /etc/apt/sources.list && \
+    echo "deb http://deb.debian.org/debian bullseye-updates main contrib non-free" >> /etc/apt/sources.list && \
+    echo "deb http://deb.debian.org/debian-security bullseye-security main contrib non-free" >> /etc/apt/sources.list
 
 # 安装系统依赖
 RUN set -eux; \
