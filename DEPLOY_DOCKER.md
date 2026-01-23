@@ -11,8 +11,8 @@
 使用我们提供的`deploy_xclabel.sh`脚本，只需一条命令即可完成所有部署工作，包括安装Docker、Docker Compose和Git（如果未安装）：
 
 ```bash
-# 下载并运行一键部署脚本
-curl -fsSL https://raw.githubusercontent.com/linjunbin0101/biaozhu-test/master/deploy_xclabel.sh -o deploy_xclabel.sh && chmod +x deploy_xclabel.sh && ./deploy_xclabel.sh
+# 下载并运行一键部署脚本（包含sudo权限）
+curl -fsSL https://raw.githubusercontent.com/linjunbin0101/biaozhu-test/master/deploy_xclabel.sh -o deploy_xclabel.sh && sudo chmod +x deploy_xclabel.sh && sudo ./deploy_xclabel.sh
 ```
 
 #### 方法2：使用命令行部署
@@ -20,19 +20,19 @@ curl -fsSL https://raw.githubusercontent.com/linjunbin0101/biaozhu-test/master/d
 如果您的服务器已安装Docker和Docker Compose，也可以直接使用以下命令部署或更新：
 
 ```bash
-# 一键部署/更新（处理项目已存在情况）
+# 一键部署/更新（处理项目已存在情况，包含sudo权限）
 if [ -d "/opt/biaozhu-test" ]; then \
     cd /opt/biaozhu-test && \
-    docker-compose down && \
-    git pull && \
-    docker-compose build --no-cache && \
-    docker-compose up -d; \
+    sudo docker-compose down && \
+    sudo git pull && \
+    sudo docker-compose build --no-cache && \
+    sudo sudo docker-compose up -d; \
 else \
     sudo mkdir -p /opt/biaozhu-test && \
     sudo chown -R $USER:$USER /opt/biaozhu-test && \
-    git clone https://github.com/linjunbin0101/biaozhu-test.git /opt/biaozhu-test && \
+    sudo git clone https://github.com/linjunbin0101/biaozhu-test.git /opt/biaozhu-test && \
     cd /opt/biaozhu-test && \
-    docker-compose up -d; \
+    sudo docker-compose up -d; \
 fi
 ```
 
@@ -100,7 +100,7 @@ curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o 
 
 ```bash
 # 克隆仓库到本地
- git clone https://github.com/linjunbin0101/biaozhu-test.git
+ sudo git clone https://github.com/linjunbin0101/biaozhu-test.git
  cd biaozhu-test
 ```
 
@@ -108,7 +108,7 @@ curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o 
 
 ```bash
 # 使用Docker Compose启动服务
- docker-compose up -d
+ sudo docker-compose up -d
 ```
 
 ### 方法2：手动下载部署
@@ -138,8 +138,9 @@ curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o 
 3. **启动服务**
 
 ```bash
+# 启动服务
 # 使用Docker Compose启动服务
- docker-compose up -d
+ sudo docker-compose up -d
 ```
 
 ## 访问服务
@@ -154,48 +155,48 @@ curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o 
 ### 启动服务
 
 ```bash
-docker-compose up -d
+sudo docker-compose up -d
 ```
 
 ### 停止服务
 
 ```bash
-docker-compose down
+sudo docker-compose down
 ```
 
 ### 查看服务状态
 
 ```bash
-docker-compose ps
+sudo docker-compose ps
 ```
 
 ### 查看服务日志
 
 ```bash
 # 查看实时日志
-docker-compose logs -f
+sudo docker-compose logs -f
 
 # 查看特定服务日志
-docker-compose logs -f xclabel
+sudo docker-compose logs -f xclabel
 
 # 查看最近100行日志
-docker-compose logs --tail=100 xclabel
+sudo docker-compose logs --tail=100 xclabel
 ```
 
 ### 重启服务
 
 ```bash
-docker-compose restart
+sudo docker-compose restart
 ```
 
 ### 构建/重新构建镜像
 
 ```bash
 # 构建镜像
-docker-compose build
+sudo docker-compose build
 
 # 重新构建镜像（不使用缓存）
-docker-compose build --no-cache
+sudo docker-compose build --no-cache
 ```
 
 ## 目录结构说明
@@ -241,8 +242,8 @@ ports:
 修改后，需要重启服务：
 
 ```bash
-docker-compose down
-docker-compose up -d
+sudo docker-compose down
+sudo docker-compose up -d
 ```
 
 ### 修改时区
@@ -271,16 +272,18 @@ environment:
 # 进入项目目录
 cd /opt/biaozhu-test
 
+#```bash
 # 拉取最新代码
-git pull
+sudo git pull
 ```
 
 2. **重新构建并启动服务**
 
 ```bash
-docker-compose down
-docker-compose build --no-cache
-docker-compose up -d
+sudo docker-compose down
+sudo docker-compose build --no-cache
+sudo docker-compose up -d
+```
 ```
 
 ## 故障排除
@@ -290,7 +293,7 @@ docker-compose up -d
 1. **查看日志**
 
 ```bash
-docker-compose logs -f
+sudo docker-compose logs -f
 ```
 
 2. **检查端口占用**
@@ -359,8 +362,8 @@ docker-compose up -d
 
 ### 访问时出现502错误
 
-- 检查服务是否正在运行：`docker-compose ps`
-- 检查容器日志：`docker-compose logs -f xclabel`
+- 检查服务是否正在运行：`sudo docker-compose ps`
+- 检查容器日志：`sudo docker-compose logs -f xclabel`
 - 检查端口映射是否正确
 
 ### 上传文件失败
@@ -423,7 +426,7 @@ server {
 A: 您可以使用以下命令进入容器：
 
 ```bash
-docker exec -it xclabel /bin/bash
+sudo docker exec -it xclabel /bin/bash
 ```
 
 ### Q: 如何修改配置文件？
@@ -431,7 +434,7 @@ docker exec -it xclabel /bin/bash
 A: 直接修改宿主机上的配置文件，修改后重启服务即可：
 
 ```bash
-docker-compose restart
+sudo docker-compose restart
 ```
 
 ### Q: 如何清理未使用的Docker资源？
@@ -439,7 +442,7 @@ docker-compose restart
 A: 您可以使用以下命令清理未使用的Docker资源：
 
 ```bash
-docker system prune -f
+sudo docker system prune -f
 ```
 
 ## 技术支持
