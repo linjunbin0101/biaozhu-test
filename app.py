@@ -2484,7 +2484,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
     
     # 使用SocketIO运行应用，使用命令行参数
-    socketio.run(app, debug=args.debug, host=args.host, port=args.port)
+    socketio.run(app, debug=args.debug, host=args.host, port=args.port, allow_unsafe_werkzeug=True)
 
 
 def process_content_data(content_data, annotations):
