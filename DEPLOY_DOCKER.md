@@ -21,17 +21,17 @@ curl -fsSL https://raw.githubusercontent.com/linjunbin0101/biaozhu-test/master/d
 
 ```bash
 # 一键部署/更新（处理项目已存在情况）
-if [ -d "/opt/biaozhu-test" ]; then \
-    cd /opt/biaozhu-test && \
+if [ -d "/opt/xclabel" ]; then \
+    cd /opt/xclabel && \
     docker-compose down && \
     git pull && \
     docker-compose build --no-cache && \
     docker-compose up -d; \
 else \
-    sudo mkdir -p /opt/biaozhu-test && \
-    sudo chown -R $USER:$USER /opt/biaozhu-test && \
-    git clone https://github.com/linjunbin0101/biaozhu-test.git /opt/biaozhu-test && \
-    cd /opt/biaozhu-test && \
+    sudo mkdir -p /opt/xclabel && \
+    sudo chown -R $USER:$USER /opt/xclabel && \
+    git clone https://gitee.com/Vanishi/xclabel.git /opt/xclabel && \
+    cd /opt/xclabel && \
     docker-compose up -d; \
 fi
 ```
@@ -203,7 +203,7 @@ docker-compose build --no-cache
 部署后，项目目录结构如下：
 
 ```
-/opt/biaozhu-test/
+/opt/xclabel/
 ├── uploads/          # 上传的图片和视频存储目录（持久化）
 ├── plugins/          # 插件目录，用于YOLO11安装（持久化）
 ├── static/           # 静态资源目录
@@ -269,7 +269,7 @@ environment:
 
 ```bash
 # 进入项目目录
-cd /opt/biaozhu-test
+cd /opt/xclabel
 
 # 拉取最新代码
 git pull

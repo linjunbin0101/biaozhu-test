@@ -16,7 +16,7 @@ echo -e "${GREEN}=======================================${NC}"
 echo -e ""
 
 # 项目目录
-PROJECT_DIR="/opt/biaozhu-test"
+PROJECT_DIR="/opt/xclabel"
 
 # 检查是否为root用户
 if [ "$EUID" -eq 0 ]; then
@@ -46,7 +46,7 @@ else
     
     # 克隆代码
     echo -e "${GREEN}   1.2 克隆代码...${NC}"
-    git clone https://github.com/linjunbin0101/biaozhu-test.git "$PROJECT_DIR"
+    git clone https://gitee.com/Vanishi/xclabel.git "$PROJECT_DIR"
     cd "$PROJECT_DIR"
 fi
 
