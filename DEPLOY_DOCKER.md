@@ -308,6 +308,55 @@ sudo netstat -tuln | grep 9924
 sudo systemctl status docker
 ```
 
+4. **镜像加速器问题**
+
+如果遇到以下错误：
+```
+failed to resolve source metadata for docker.io/library/python:3.10-slim-bullseye: unexpected status from HEAD request to `https://iwl3ndc7.mirror.aliyuncs.com/v2/library/python/manifests/3.10-slim-bullseye?ns=docker.io:`  403 Forbidden
+```
+
+这是Docker镜像加速器返回403 Forbidden错误，导致无法拉取镜像。可以按照以下步骤解决：
+
+**解决方案1：暂时禁用镜像加速器**
+
+```bash
+# 编辑Docker守护进程配置文件
+sudo nano /etc/docker/daemon.json
+```
+
+将配置文件中的`registry-mirrors`部分注释掉或清空：
+```json
+{
+  "registry-mirrors": []
+}
+```
+
+**解决方案2：更换镜像加速器**
+
+```bash
+# 编辑Docker守护进程配置文件
+sudo nano /etc/docker/daemon.json
+```
+
+更换为其他可用的镜像加速器：
+```json
+{
+  "registry-mirrors": ["https://docker.mirrors.ustc.edu.cn", "https://hub-mirror.c.163.com"]
+}
+```
+
+**重启Docker服务**
+
+```bash
+sudo systemctl daemon-reload
+sudo systemctl restart docker
+```
+
+然后再尝试启动服务：
+```bash
+docker-compose up -d
+```
+
 ### 访问时出现502错误
 
 - 检查服务是否正在运行：`docker-compose ps`
