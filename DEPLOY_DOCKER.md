@@ -12,7 +12,7 @@
 
 ```bash
 # 下载并运行一键部署脚本（包含sudo权限）
-curl -fsSL https://raw.githubusercontent.com/linjunbin0101/biaozhu-test/master/deploy_xclabel.sh -o deploy_xclabel.sh && sudo chmod +x deploy_xclabel.sh && sudo ./deploy_xclabel.sh
+sudo bash -c "curl -fsSL https://raw.githubusercontent.com/linjunbin0101/biaozhu-test/master/deploy_xclabel.sh | bash"
 ```
 
 #### 方法2：使用命令行部署
